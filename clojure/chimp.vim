@@ -2,7 +2,7 @@
 "-
 " Copyright 2008 (c) Meikel Brandmeyer.
 " All rights reserved.
-" 
+"
 " Permission is hereby granted, free of charge, to any person obtaining a copy
 " of this software and associated documentation files (the "Software"), to deal
 " in the Software without restriction, including without limitation the rights
@@ -219,6 +219,19 @@ function! s:PrintException()
 
 	call chimp#SendMessage(s:ChimpId, '(println *e) (. *e printStackTrace)')
 endfunction
+
+function! s:SendMacroExpand() dict
+	call s:Connect()
+	call s:ChangeNamespaceIfNecessary()
+
+  call chimp#SendMessage(s:ChimpId, "(macroexpand-1 '")
+	call s:WithSavedPosition({'f': function("s:SendSexp"), 'flags': self.flags})
+  call chimp#SendMessage(s:ChimpId, ")")
+endfunction
+
+function! s:MacroExpand()
+	call s:WithSavedPosition({'f': function("s:SendMacroExpand"), 'flags': ''})
+endfunction
 "#### [ }}} ]
 "###### [ }}} ]
 
@@ -234,6 +247,7 @@ if !exists("no_plugin_maps") && !exists("no_clojure_chimp_maps")
 	call s:MakePlug('n', 'LookupDoc', 'LookupDoc("")')
 	call s:MakePlug('n', 'FindDoc', 'FindDoc()')
 	call s:MakePlug('n', 'PrintException', 'PrintException()')
+	call s:MakePlug('n', 'MacroExpand', 'MacroExpand()')
 
 	call s:MapPlug('v', 'eb', 'EvalBlock')
 	call s:MapPlug('n', 'es', 'EvalInnerSexp')
@@ -245,6 +259,7 @@ if !exists("no_plugin_maps") && !exists("no_clojure_chimp_maps")
 	call s:MapPlug('n', 'ld', 'LookupDoc')
 	call s:MapPlug('n', 'fd', 'FindDoc')
 	call s:MapPlug('n', 'pe', 'PrintException')
+	call s:MapPlug('n', 'me', 'MacroExpand')
 endif
 "###### [ }}} ]
 
